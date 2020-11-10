@@ -4,6 +4,7 @@ import android.media.MediaCodec
 import android.media.MediaFormat
 import android.util.Log
 import com.yny.yplayer.Frame
+import com.yny.yplayer.constrant.DecodeInformation
 import com.yny.yplayer.constrant.DecodeStateEnum
 import com.yny.yplayer.extractor.IExtractor
 import com.yny.yplayer.listener.IDecoderStateListener
@@ -111,7 +112,8 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
 
                     // ---------【同步时间矫正】-------------
                     //恢复同步的起始时间，即去除等待流失的时间
-                    mStartTimeForSync = System.currentTimeMillis() - getCurTimeStamp()
+                    mStartTimeForSync =
+                        System.currentTimeMillis() - getDecodeInformation().curTimestamp
                 }
 
                 if (!mIsRunning ||
@@ -275,7 +277,7 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
 
     private fun sleepRender() {
         val passTime = System.currentTimeMillis() - mStartTimeForSync
-        val curTime = getCurTimeStamp()
+        val curTime = getDecodeInformation().curTimestamp
         if (curTime > passTime) {
             Thread.sleep(curTime - passTime)
         }
@@ -364,36 +366,17 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
         mStateListener = l
     }
 
-    override fun getWidth(): Int {
-        return mVideoWidth
-    }
-
-    override fun getHeight(): Int {
-        return mVideoHeight
-    }
-
-    override fun getDuration(): Long {
-        return mDuration
-    }
-
-    override fun getCurTimeStamp(): Long {
-        return mBufferInfo.presentationTimeUs / 1000
-    }
-
-    override fun getRotationAngle(): Int {
-        return 0
-    }
-
-    override fun getMediaFormat(): MediaFormat? {
-        return mExtractor?.getFormat()
-    }
-
-    override fun getTrack(): Int {
-        return 0
-    }
-
-    override fun getFilePath(): String {
-        return mFilePath
+    override fun getDecodeInformation(): DecodeInformation {
+        return DecodeInformation().apply {
+            width = mVideoWidth
+            height = mVideoHeight
+            duration = mDuration
+            curTimestamp = mBufferInfo.presentationTimeUs / 1000
+            rotationAngle = 0
+            mediaFormat = mExtractor?.getFormat()
+            mediaTrack = 0
+            filePath = mFilePath
+        }
     }
 
     override fun withoutSync(): IDecoder {
