@@ -25,7 +25,7 @@ class VideoDecoder(path: String, sfv: SurfaceView?, surface: Surface?): BaseDeco
     override fun check(): Boolean {
         if (mSurfaceView == null && mSurface == null) {
             Log.w(TAG, "SurfaceView和Surface都为空，至少需要一个不为空")
-            mStateListener?.decoderError(this, "显示器为空")
+            decodeStateListener?.decoderError(this, "显示器为空")
             return false
         }
         return true
