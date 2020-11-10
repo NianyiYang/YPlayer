@@ -1,16 +1,22 @@
 package com.yny.yplayer
 
-import androidx.appcompat.app.AppCompatActivity
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import com.yny.yplayer.decoder.AudioDecoder
 import com.yny.yplayer.decoder.VideoDecoder
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.io.IOException
 import java.util.concurrent.Executors
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,15 +28,20 @@ class MainActivity : AppCompatActivity() {
             initPlayer()
         }
 
+        findViewById<Button>(R.id.btn_trace).setOnClickListener {
+            tracePlayer()
+        }
+
         requestPermission()
     }
 
     private fun requestPermission() {
-        val permissions = Permission.Group.STORAGE
         AndPermission.with(this)
             .runtime()
-            .permission(Permission.Group.MICROPHONE)
-            .permission(permissions)
+            .permission(
+                Permission.Group.STORAGE,
+                Permission.Group.MICROPHONE
+            )
             .onGranted {
 
             }
@@ -42,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initPlayer() {
         val path =
-            Environment.getExternalStorageDirectory().absolutePath + "/VID_20201031_101628.mp4"
+            Environment.getExternalStorageDirectory().absolutePath + "/aaa.mp4"
 
         // 创建线程池
         val threadPool = Executors.newFixedThreadPool(10)
@@ -60,8 +71,30 @@ class MainActivity : AppCompatActivity() {
         audioDecoder.resume()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun tracePlayer() {
+        val file = File(Environment.getExternalStorageDirectory().absolutePath + "/aaa.mp4")
+        if (!file.exists()) {
+            Log.i(MainActivity::class.java.simpleName, "mp4文件不存在")
+            return
+        }
+        //实例一个MediaExtractor
+        val extractor = MediaExtractor()
+
+        try {
+            extractor.setDataSource(file.absolutePath) //设置添加MP4文件路径
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        val count = extractor.trackCount //获取轨道数量
+
+        Log.e(MainActivity::class.java.simpleName, "轨道数量 = $count")
+        for (i in 0 until count) {
+            val mediaFormat = extractor.getTrackFormat(0)
+            Log.i(
+                MainActivity::class.java.simpleName,
+                i.toString() + "编号通道格式 = " + mediaFormat.getString(MediaFormat.KEY_MIME)
+            )
+        }
     }
 
     /**
