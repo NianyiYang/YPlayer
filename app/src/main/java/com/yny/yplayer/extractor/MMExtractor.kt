@@ -12,43 +12,55 @@ import java.nio.ByteBuffer
  */
 class MMExtractor(path: String) {
 
-    /**音视频分离器*/
-    private var mExtractor: MediaExtractor? = null
+    /**
+     * 音视频分离器
+     */
+    private var extractor: MediaExtractor? = null
 
-    /**音频通道索引*/
-    private var mAudioTrack = -1
+    /**
+     * 音频通道索引
+     */
+    private var audioTrack = -1
 
-    /**视频通道索引*/
-    private var mVideoTrack = -1
+    /**
+     * 视频通道索引
+     * */
+    private var videoTrack = -1
 
-    /**当前帧时间戳*/
-    private var mCurSampleTime: Long = 0
+    /**
+     * 当前帧时间戳
+     * */
+    private var curSampleTime: Long = 0
 
-    /**当前帧标志*/
-    private var mCurSampleFlag: Int = 0
+    /**
+     * 当前帧标志
+     * */
+    private var curSampleFlag: Int = 0
 
-    /**开始解码时间点*/
-    private var mStartPos: Long = 0
+    /**
+     * 开始解码时间点
+     * */
+    private var startPos: Long = 0
 
     init {
-        mExtractor = MediaExtractor()
-        mExtractor?.setDataSource(path)
+        extractor = MediaExtractor()
+        extractor?.setDataSource(path)
     }
 
     /**
      * 获取视频格式参数
      */
     fun getVideoFormat(): MediaFormat? {
-        for (i in 0 until mExtractor!!.trackCount) {
-            val mediaFormat = mExtractor!!.getTrackFormat(i)
+        for (i in 0 until extractor!!.trackCount) {
+            val mediaFormat = extractor!!.getTrackFormat(i)
             val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
             if (mime != null && mime.startsWith("video/")) {
-                mVideoTrack = i
+                videoTrack = i
                 break
             }
         }
-        return if (mVideoTrack >= 0)
-            mExtractor!!.getTrackFormat(mVideoTrack)
+        return if (videoTrack >= 0)
+            extractor!!.getTrackFormat(videoTrack)
         else null
     }
 
@@ -56,16 +68,16 @@ class MMExtractor(path: String) {
      * 获取音频格式参数
      */
     fun getAudioFormat(): MediaFormat? {
-        for (i in 0 until mExtractor!!.trackCount) {
-            val mediaFormat = mExtractor!!.getTrackFormat(i)
+        for (i in 0 until extractor!!.trackCount) {
+            val mediaFormat = extractor!!.getTrackFormat(i)
             val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
             if (mime != null && mime.startsWith("audio/")) {
-                mAudioTrack = i
+                audioTrack = i
                 break
             }
         }
-        return if (mAudioTrack >= 0) {
-            mExtractor!!.getTrackFormat(mAudioTrack)
+        return if (audioTrack >= 0) {
+            extractor!!.getTrackFormat(audioTrack)
         } else null
     }
 
@@ -75,15 +87,15 @@ class MMExtractor(path: String) {
     fun readBuffer(byteBuffer: ByteBuffer): Int {
         byteBuffer.clear()
         selectSourceTrack()
-        var readSampleCount = mExtractor!!.readSampleData(byteBuffer, 0)
+        val readSampleCount = extractor!!.readSampleData(byteBuffer, 0)
         if (readSampleCount < 0) {
             return -1
         }
         //记录当前帧的时间戳
-        mCurSampleTime = mExtractor!!.sampleTime
-        mCurSampleFlag = mExtractor!!.sampleFlags
+        curSampleTime = extractor!!.sampleTime
+        curSampleFlag = extractor!!.sampleFlags
         //进入下一帧
-        mExtractor!!.advance()
+        extractor!!.advance()
         return readSampleCount
     }
 
@@ -91,10 +103,10 @@ class MMExtractor(path: String) {
      * 选择通道
      */
     private fun selectSourceTrack() {
-        if (mVideoTrack >= 0) {
-            mExtractor!!.selectTrack(mVideoTrack)
-        } else if (mAudioTrack >= 0) {
-            mExtractor!!.selectTrack(mAudioTrack)
+        if (videoTrack >= 0) {
+            extractor!!.selectTrack(videoTrack)
+        } else if (audioTrack >= 0) {
+            extractor!!.selectTrack(audioTrack)
         }
     }
 
@@ -102,38 +114,38 @@ class MMExtractor(path: String) {
      * Seek到指定位置，并返回实际帧的时间戳
      */
     fun seek(pos: Long): Long {
-        mExtractor!!.seekTo(pos, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
-        return mExtractor!!.sampleTime
+        extractor!!.seekTo(pos, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+        return extractor!!.sampleTime
     }
 
     /**
      * 停止读取数据
      */
     fun stop() {
-        mExtractor?.release()
-        mExtractor = null
+        extractor?.release()
+        extractor = null
     }
 
     fun getVideoTrack(): Int {
-        return mVideoTrack
+        return videoTrack
     }
 
     fun getAudioTrack(): Int {
-        return mAudioTrack
+        return audioTrack
     }
 
     fun setStartPos(pos: Long) {
-        mStartPos = pos
+        startPos = pos
     }
 
     /**
      * 获取当前帧时间
      */
     fun getCurrentTimestamp(): Long {
-        return mCurSampleTime
+        return curSampleTime
     }
 
     fun getSampleFlag(): Int {
-        return mCurSampleFlag
+        return curSampleFlag
     }
 }

@@ -12,19 +12,29 @@ import java.nio.ByteBuffer
  * create on 2020/11/6 5:31 PM
  */
 class AudioDecoder(path: String) : BaseDecoder(path) {
-    /**采样率*/
+    /**
+     * 采样率
+     * */
     private var sampleRate = -1
 
-    /**声音通道数量*/
+    /**
+     * 声音通道数量
+     * */
     private var channels = 1
 
-    /**PCM采样位数*/
+    /**
+     * PCM采样位数
+     * */
     private var PCMEncodeBit = AudioFormat.ENCODING_PCM_16BIT
 
-    /**音频播放器*/
+    /**
+     * 音频播放器
+     * */
     private var audioTrack: AudioTrack? = null
 
-    /**音频数据缓存*/
+    /**
+     * 音频数据缓存
+     * */
     private var audioOutTempBuf: ShortArray? = null
 
     override fun check(): Boolean {

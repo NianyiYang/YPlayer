@@ -19,11 +19,11 @@ import java.nio.ByteBuffer
 class VideoDecoder(path: String, sfv: SurfaceView?, surface: Surface?): BaseDecoder(path) {
     private val TAG = "VideoDecoder"
 
-    private val mSurfaceView = sfv
-    private var mSurface = surface
+    private val surfaceView = sfv
+    private var surface = surface
 
     override fun check(): Boolean {
-        if (mSurfaceView == null && mSurface == null) {
+        if (surfaceView == null && surface == null) {
             Log.w(TAG, "SurfaceView和Surface都为空，至少需要一个不为空")
             decodeStateListener?.decoderError(this, "显示器为空")
             return false
@@ -39,14 +39,14 @@ class VideoDecoder(path: String, sfv: SurfaceView?, surface: Surface?): BaseDeco
     }
 
     override fun configCodec(codec: MediaCodec, format: MediaFormat): Boolean {
-        if (mSurface != null) {
-            codec.configure(format, mSurface , null, 0)
+        if (surface != null) {
+            codec.configure(format, surface , null, 0)
             notifyDecode()
-        } else if (mSurfaceView?.holder?.surface != null) {
-            mSurface = mSurfaceView?.holder?.surface
+        } else if (surfaceView?.holder?.surface != null) {
+            surface = surfaceView.holder?.surface
             configCodec(codec, format)
         } else {
-            mSurfaceView?.holder?.addCallback(object : SurfaceHolder.Callback2 {
+            surfaceView?.holder?.addCallback(object : SurfaceHolder.Callback2 {
                 override fun surfaceRedrawNeeded(holder: SurfaceHolder) {
                 }
 
@@ -57,7 +57,7 @@ class VideoDecoder(path: String, sfv: SurfaceView?, surface: Surface?): BaseDeco
                 }
 
                 override fun surfaceCreated(holder: SurfaceHolder) {
-                    mSurface = holder.surface
+                    surface = holder.surface
                     configCodec(codec, format)
                 }
             })

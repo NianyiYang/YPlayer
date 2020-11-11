@@ -11,33 +11,33 @@ import java.nio.ByteBuffer
  */
 class AudioExtractor(path: String) : IExtractor {
 
-    private val mMediaExtractor = MMExtractor(path)
+    private val mediaExtractor = MMExtractor(path)
 
     override fun getFormat(): MediaFormat? {
-        return mMediaExtractor.getAudioFormat()
+        return mediaExtractor.getAudioFormat()
     }
 
     override fun readBuffer(byteBuffer: ByteBuffer): Int {
-        return mMediaExtractor.readBuffer(byteBuffer)
+        return mediaExtractor.readBuffer(byteBuffer)
     }
 
     override fun getCurrentTimestamp(): Long {
-        return mMediaExtractor.getCurrentTimestamp()
+        return mediaExtractor.getCurrentTimestamp()
     }
 
     override fun getSampleFlag(): Int {
-        return mMediaExtractor.getSampleFlag()
+        return mediaExtractor.getSampleFlag()
     }
 
     override fun seek(pos: Long): Long {
-        return mMediaExtractor.seek(pos)
+        return mediaExtractor.seek(pos)
     }
 
     override fun setStartPos(pos: Long) {
-        return mMediaExtractor.setStartPos(pos)
+        return mediaExtractor.setStartPos(pos)
     }
 
     override fun stop() {
-        mMediaExtractor.stop()
+        mediaExtractor.stop()
     }
 }

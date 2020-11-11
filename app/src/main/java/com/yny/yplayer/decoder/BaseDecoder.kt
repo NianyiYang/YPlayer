@@ -17,7 +17,7 @@ import java.nio.ByteBuffer
  * @author nianyi.yang
  * create on 2020/11/6 3:47 PM
  */
-abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
+abstract class BaseDecoder(private val filePath: String) : IDecoder {
 
     companion object {
         const val TAG = "BaseDecoder"
@@ -129,9 +129,9 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
                     startTimeForSync = System.currentTimeMillis()
                 }
 
-                //如果数据没有解码完毕，将数据推入解码器解码
+                // 如果数据没有解码完毕，将数据推入解码器解码
                 if (!isEOS) {
-                    //【解码步骤：2. 见数据压入解码器输入缓冲】
+                    //【解码步骤：2. 将数据压入解码器输入缓冲】
                     isEOS = pushBufferToDecoder()
                 }
 
@@ -176,7 +176,7 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
     }
 
     private fun init(): Boolean {
-        if (mFilePath.isEmpty() || !File(mFilePath).exists()) {
+        if (filePath.isEmpty() || !File(filePath).exists()) {
             Log.w(TAG, "文件路径为空")
             decodeStateListener?.decoderError(this, "文件路径为空")
             return false
@@ -185,7 +185,7 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
         if (!check()) return false
 
         //初始化数据提取器
-        extractor = initExtractor(mFilePath)
+        extractor = initExtractor(filePath)
         if (extractor == null ||
             extractor!!.getFormat() == null
         ) {
@@ -235,7 +235,7 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
     }
 
     private fun pushBufferToDecoder(): Boolean {
-        var inputBufferIndex = mediaCodec!!.dequeueInputBuffer(1000)
+        val inputBufferIndex = mediaCodec!!.dequeueInputBuffer(1000)
         var isEndOfStream = false
 
         if (inputBufferIndex >= 0) {
@@ -377,7 +377,7 @@ abstract class BaseDecoder(private val mFilePath: String) : IDecoder {
             rotationAngle = 0
             mediaFormat = extractor?.getFormat()
             mediaTrack = 0
-            filePath = mFilePath
+            filePath = this@BaseDecoder.filePath
         }
     }
 
