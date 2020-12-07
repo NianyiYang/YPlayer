@@ -4,8 +4,8 @@ import android.media.MediaCodec
 import android.media.MediaFormat
 import android.util.Log
 import com.yny.yplayer.Frame
-import com.yny.yplayer.constrant.DecodeInformation
-import com.yny.yplayer.constrant.DecodeStateEnum
+import com.yny.yplayer.constant.DecodeInformation
+import com.yny.yplayer.constant.DecodeStateEnum
 import com.yny.yplayer.extractor.IExtractor
 import com.yny.yplayer.listener.IDecoderStateListener
 import java.io.File

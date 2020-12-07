@@ -1,7 +1,6 @@
-package com.yny.yplayer.constrant
+package com.yny.yplayer.constant
 
 import android.media.MediaFormat
-import java.time.Duration
 
 /**
  * Media 解析出来的信息

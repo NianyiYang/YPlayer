@@ -1,6 +1,6 @@
 package com.yny.yplayer.decoder
 
-import com.yny.yplayer.constrant.DecodeInformation
+import com.yny.yplayer.constant.DecodeInformation
 import com.yny.yplayer.listener.IDecoderStateListener
 
 /**

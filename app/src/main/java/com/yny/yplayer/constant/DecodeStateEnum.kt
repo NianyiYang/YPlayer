@@ -1,4 +1,4 @@
-package com.yny.yplayer.constrant
+package com.yny.yplayer.constant
 
 /**
  * 解码状态
